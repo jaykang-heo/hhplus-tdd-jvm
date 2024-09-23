@@ -2,7 +2,12 @@ package io.hhplus.tdd.point
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/point")
@@ -14,7 +19,7 @@ class PointController {
      */
     @GetMapping("{id}")
     fun point(
-        @PathVariable id: Long,
+        @PathVariable id: Long
     ): UserPoint {
         return UserPoint(0, 0, 0)
     }
@@ -24,7 +29,7 @@ class PointController {
      */
     @GetMapping("{id}/histories")
     fun history(
-        @PathVariable id: Long,
+        @PathVariable id: Long
     ): List<PointHistory> {
         return emptyList()
     }
@@ -35,7 +40,7 @@ class PointController {
     @PatchMapping("{id}/charge")
     fun charge(
         @PathVariable id: Long,
-        @RequestBody amount: Long,
+        @RequestBody amount: Long
     ): UserPoint {
         return UserPoint(0, 0, 0)
     }
@@ -46,7 +51,7 @@ class PointController {
     @PatchMapping("{id}/use")
     fun use(
         @PathVariable id: Long,
-        @RequestBody amount: Long,
+        @RequestBody amount: Long
     ): UserPoint {
         return UserPoint(0, 0, 0)
     }
