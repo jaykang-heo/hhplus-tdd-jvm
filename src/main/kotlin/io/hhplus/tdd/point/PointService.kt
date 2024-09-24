@@ -4,6 +4,7 @@ import io.hhplus.tdd.point.command.ChargePointCommand
 import io.hhplus.tdd.point.command.UsePointCommand
 import io.hhplus.tdd.point.model.PointHistory
 import io.hhplus.tdd.point.model.UserPoint
+import io.hhplus.tdd.point.modifier.ChargePointCommandPreModifier
 import io.hhplus.tdd.point.ports.IPointService
 import io.hhplus.tdd.point.ports.PointHistoryRepository
 import io.hhplus.tdd.point.ports.UserPointRepository
@@ -20,12 +21,14 @@ class PointService(
     private val pointHistoryRepository: PointHistoryRepository,
     private val findUserPointQueryValidator: FindUserPointQueryValidator,
     private val findPointHistoryQueryValidator: FindPointHistoryQueryValidator,
-    private val chargePointCommandValidator: ChargePointCommandValidator
+    private val chargePointCommandValidator: ChargePointCommandValidator,
+    private val chargePointCommandPreModifier: ChargePointCommandPreModifier
 ) : IPointService {
 
     override fun charge(command: ChargePointCommand): UserPoint {
         chargePointCommandValidator.validate(command)
-        return userPointRepository.charge(command)
+        val modifiedCommand = chargePointCommandPreModifier.modify(command)
+        return userPointRepository.charge(modifiedCommand)
     }
 
     override fun use(command: UsePointCommand): UserPoint {
