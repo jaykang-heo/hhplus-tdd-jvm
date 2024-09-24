@@ -1,5 +1,6 @@
 package io.hhplus.tdd.point
 
+import io.hhplus.tdd.dummy.DummyChargePointCommandValidator
 import io.hhplus.tdd.dummy.DummyFindPointHistoryQueryValidator
 import io.hhplus.tdd.dummy.DummyFindUserPointQueryValidator
 import io.hhplus.tdd.point.command.ChargePointCommand
@@ -24,11 +25,13 @@ class PointServiceTest {
     private val mockPointHistoryRepository = mock(PointHistoryRepository::class.java)
     private val dummyFindUserPointQueryValidator = DummyFindUserPointQueryValidator()
     private val dummyFindPointHistoryQueryValidator = DummyFindPointHistoryQueryValidator()
+    private val dummyChargePointCommandValidator = DummyChargePointCommandValidator()
     private val sut = PointService(
         mockUserPointRepository,
         mockPointHistoryRepository,
         dummyFindUserPointQueryValidator,
-        dummyFindPointHistoryQueryValidator
+        dummyFindPointHistoryQueryValidator,
+        dummyChargePointCommandValidator
     )
 
     @Test
