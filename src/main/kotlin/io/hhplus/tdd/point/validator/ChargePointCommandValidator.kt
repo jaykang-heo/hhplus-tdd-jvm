@@ -9,5 +9,9 @@ class ChargePointCommandValidator {
         if (command.id < 1) {
             throw RuntimeException("id:${command.id} cannot be less than 1")
         }
+
+        if (command.amount < 1) {
+            throw RuntimeException("amount:${command.amount} cannot be less than 1")
+        }
     }
 }
