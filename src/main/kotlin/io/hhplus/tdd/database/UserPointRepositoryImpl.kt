@@ -14,12 +14,14 @@ class UserPointRepositoryImpl(
 ) : UserPointRepository {
     override fun charge(command: ChargePointCommand): UserPoint {
         pointHistoryTable.insert(command.id, command.amount, TransactionType.CHARGE, System.currentTimeMillis())
-        return userPointTable.insertOrUpdate(command.id, command.amount)
+        val pointSum = getById(command.id).point + command.amount
+        return userPointTable.insertOrUpdate(command.id, pointSum)
     }
 
     override fun use(command: UsePointCommand): UserPoint {
         pointHistoryTable.insert(command.id, command.amount, TransactionType.USE, System.currentTimeMillis())
-        return userPointTable.insertOrUpdate(command.id, command.amount)
+        val subtractedPoint = getById(command.id).point - command.amount
+        return userPointTable.insertOrUpdate(command.id, subtractedPoint)
     }
 
     override fun getById(id: Long): UserPoint {

@@ -13,9 +13,7 @@ class FakeUserPointTable : UserPointTable() {
     }
 
     override fun insertOrUpdate(id: Long, amount: Long): UserPoint {
-        val currentPoint = table[id]?.point ?: 0L
-        val newAmount = currentPoint + amount
-        val userPoint = UserPoint(id = id, point = newAmount, updateMillis = fixedUpdateMillis)
+        val userPoint = UserPoint(id = id, point = amount, updateMillis = fixedUpdateMillis)
         table[id] = userPoint
         return userPoint
     }
