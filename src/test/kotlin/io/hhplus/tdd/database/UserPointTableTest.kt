@@ -81,4 +81,18 @@ class UserPointTableTest {
         assertThat(actual.updateMillis).isNotNull()
         assertThat(actual.updateMillis).isCloseTo(expected.updateMillis, within(1000L))
     }
+
+    @Test
+    @DisplayName("")
+    fun `when`() {
+        // given
+        val id = Random.nextLong()
+        val amount = Long.MAX_VALUE + 1
+
+        // when
+        val actual = sut.insertOrUpdate(id, amount)
+
+        // then
+        println(actual)
+    }
 }
