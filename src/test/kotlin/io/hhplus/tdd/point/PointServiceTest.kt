@@ -1,5 +1,6 @@
 package io.hhplus.tdd.point
 
+import io.hhplus.tdd.dummy.DummyFindPointHistoryQueryValidator
 import io.hhplus.tdd.dummy.DummyFindUserPointQueryValidator
 import io.hhplus.tdd.point.command.ChargePointCommand
 import io.hhplus.tdd.point.command.UsePointCommand
@@ -22,7 +23,13 @@ class PointServiceTest {
     private val mockUserPointRepository = mock(UserPointRepository::class.java)
     private val mockPointHistoryRepository = mock(PointHistoryRepository::class.java)
     private val dummyFindUserPointQueryValidator = DummyFindUserPointQueryValidator()
-    private val sut = PointService(mockUserPointRepository, mockPointHistoryRepository, dummyFindUserPointQueryValidator)
+    private val dummyFindPointHistoryQueryValidator = DummyFindPointHistoryQueryValidator()
+    private val sut = PointService(
+        mockUserPointRepository,
+        mockPointHistoryRepository,
+        dummyFindUserPointQueryValidator,
+        dummyFindPointHistoryQueryValidator
+    )
 
     @Test
     @DisplayName("포인트 충전 명령을 내리면, 저장 명령을 내린 포인트 금액과 함께 유저 포인트를 반환한다")
