@@ -1,5 +1,6 @@
 package io.hhplus.tdd.database
 
+import io.hhplus.tdd.fake.FakeLockManager
 import io.hhplus.tdd.fake.FakePointHistoryTable
 import io.hhplus.tdd.fake.FakeUserPointTable
 import io.hhplus.tdd.point.command.ChargePointCommand
@@ -16,7 +17,8 @@ class UserPointRepositoryTest {
 
     private val fakeUserPointTable: UserPointTable = FakeUserPointTable()
     private val fakePointHistoryTable: PointHistoryTable = FakePointHistoryTable()
-    private val sut = UserPointRepositoryImpl(fakeUserPointTable, fakePointHistoryTable)
+    private val fakeLockManager = FakeLockManager()
+    private val sut = UserPointRepositoryImpl(fakeUserPointTable, fakePointHistoryTable, fakeLockManager)
 
     @Test
     @DisplayName("포인트를 충전하면, 포인트 내역과 유저 포인트를 저장하고 유저 포인트를 반환한다")
