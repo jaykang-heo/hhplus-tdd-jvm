@@ -13,6 +13,7 @@ import io.hhplus.tdd.point.query.FindUserPointQuery
 import io.hhplus.tdd.point.validator.ChargePointCommandValidator
 import io.hhplus.tdd.point.validator.FindPointHistoryQueryValidator
 import io.hhplus.tdd.point.validator.FindUserPointQueryValidator
+import io.hhplus.tdd.point.validator.UsePointCommandValidator
 import org.springframework.stereotype.Service
 
 @Service
@@ -22,6 +23,7 @@ class PointService(
     private val findUserPointQueryValidator: FindUserPointQueryValidator,
     private val findPointHistoryQueryValidator: FindPointHistoryQueryValidator,
     private val chargePointCommandValidator: ChargePointCommandValidator,
+    private val usePointCommandValidator: UsePointCommandValidator,
     private val chargePointCommandPreModifier: ChargePointCommandPreModifier
 ) : IPointService {
 
@@ -32,6 +34,7 @@ class PointService(
     }
 
     override fun use(command: UsePointCommand): UserPoint {
+        usePointCommandValidator.validate(command)
         return userPointRepository.use(command)
     }
 
