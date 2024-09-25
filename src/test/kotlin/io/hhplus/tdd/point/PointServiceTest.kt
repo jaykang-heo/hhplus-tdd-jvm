@@ -1,5 +1,6 @@
 package io.hhplus.tdd.point
 
+import io.hhplus.tdd.dummy.DummyChargePointCommandValidator
 import io.hhplus.tdd.dummy.DummyFindPointHistoryQueryValidator
 import io.hhplus.tdd.dummy.DummyFindUserPointQueryValidator
 import io.hhplus.tdd.point.command.ChargePointCommand
@@ -11,6 +12,7 @@ import io.hhplus.tdd.point.ports.PointHistoryRepository
 import io.hhplus.tdd.point.ports.UserPointRepository
 import io.hhplus.tdd.point.query.FindPointHistoryQuery
 import io.hhplus.tdd.point.query.FindUserPointQuery
+import io.hhplus.tdd.stub.StubChargePointCommandPreModifier
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -24,11 +26,15 @@ class PointServiceTest {
     private val mockPointHistoryRepository = mock(PointHistoryRepository::class.java)
     private val dummyFindUserPointQueryValidator = DummyFindUserPointQueryValidator()
     private val dummyFindPointHistoryQueryValidator = DummyFindPointHistoryQueryValidator()
+    private val dummyChargePointCommandValidator = DummyChargePointCommandValidator()
+    private val stubChargePointCommandPreModifier = StubChargePointCommandPreModifier()
     private val sut = PointService(
         mockUserPointRepository,
         mockPointHistoryRepository,
         dummyFindUserPointQueryValidator,
-        dummyFindPointHistoryQueryValidator
+        dummyFindPointHistoryQueryValidator,
+        dummyChargePointCommandValidator,
+        stubChargePointCommandPreModifier
     )
 
     @Test
