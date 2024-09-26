@@ -1,21 +1,29 @@
 package io.hhplus.tdd.point
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.hhplus.tdd.database.UserPointTable
 import io.hhplus.tdd.point.model.UserPoint
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.http.MediaType
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
+@AutoConfigureMockMvc
 class PointControllerIntegrationTest(
-    @Autowired private val webTestClient: WebTestClient,
-    @Autowired private val userPointTable: UserPointTable
+    @Autowired private val mockMvc: MockMvc,
+    @Autowired private val userPointTable: UserPointTable,
+    @Autowired private val objectMapper: ObjectMapper
 ) {
 
     @Test
@@ -29,24 +37,27 @@ class PointControllerIntegrationTest(
         // when
         val futures = (1..numberOfOperations).map {
             CompletableFuture.runAsync {
-                webTestClient.patch()
-                    .uri("/point/$userId/charge")
-                    .bodyValue(chargeAmount)
-                    .exchange()
-                    .expectStatus().isOk
+                mockMvc.perform(
+                    patch("/point/$userId/charge")
+                        .content(chargeAmount.toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                    .andExpect(status().isOk)
             }
         }
 
         CompletableFuture.allOf(*futures.toTypedArray()).get(10, TimeUnit.SECONDS)
 
         // then
-        val actual = webTestClient.get()
-            .uri("/point/$userId")
-            .exchange()
-            .expectStatus().isOk
-            .expectBody(UserPoint::class.java)
-            .returnResult()
-            .responseBody?.point ?: 0
+        val getResult = mockMvc.perform(
+            get("/point/$userId")
+        )
+            .andExpect(status().isOk)
+            .andReturn()
+
+        val responseContent = getResult.response.contentAsString
+        val userPoint = objectMapper.readValue(responseContent, UserPoint::class.java)
+        val actual = userPoint.point
         val expected = chargeAmount * numberOfOperations
         assertThat(actual).isEqualTo(expected)
     }
@@ -63,24 +74,28 @@ class PointControllerIntegrationTest(
         val expectedTotal = chargeAmounts.sum()
         val futures = chargeAmounts.map { amount ->
             CompletableFuture.runAsync {
-                webTestClient.patch()
-                    .uri("/point/$userId/charge")
-                    .bodyValue(amount)
-                    .exchange()
-                    .expectStatus().isOk
+                mockMvc.perform(
+                    patch("/point/$userId/charge")
+                        .content(amount.toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                    .andExpect(status().isOk)
             }
         }
         CompletableFuture.allOf(*futures.toTypedArray()).get(10, TimeUnit.SECONDS)
 
         // then
-        val expected = webTestClient.get()
-            .uri("/point/$userId")
-            .exchange()
-            .expectStatus().isOk
-            .expectBody(UserPoint::class.java)
-            .returnResult()
-            .responseBody?.point!!
-        assertThat(expected).isEqualTo(expectedTotal)
+        val getResult = mockMvc.perform(
+            get("/point/$userId")
+        )
+            .andExpect(status().isOk)
+            .andReturn()
+
+        val responseContent = getResult.response.contentAsString
+        val userPoint = objectMapper.readValue(responseContent, UserPoint::class.java)
+        val actual = userPoint.point
+        val expected = expectedTotal
+        assertThat(actual).isEqualTo(expected)
     }
 
     @Test
@@ -97,26 +112,28 @@ class PointControllerIntegrationTest(
         val futures = randomUserIds.flatMap { userId ->
             (1..chargesPerUser).map {
                 CompletableFuture.runAsync {
-                    webTestClient.patch()
-                        .uri("/point/$userId/charge")
-                        .bodyValue(chargeAmount)
-                        .exchange()
-                        .expectStatus().isOk
+                    mockMvc.perform(
+                        patch("/point/$userId/charge")
+                            .content(chargeAmount.toString())
+                            .contentType(MediaType.APPLICATION_JSON)
+                    )
+                        .andExpect(status().isOk)
                 }
             }
         }
-
         CompletableFuture.allOf(*futures.toTypedArray()).get(10, TimeUnit.SECONDS)
 
         // then
         randomUserIds.forEach { userId ->
-            val finalPoint = webTestClient.get()
-                .uri("/point/$userId")
-                .exchange()
-                .expectStatus().isOk
-                .expectBody(UserPoint::class.java)
-                .returnResult()
-                .responseBody?.point!!
+            val getResult = mockMvc.perform(
+                get("/point/$userId")
+            )
+                .andExpect(status().isOk)
+                .andReturn()
+
+            val responseContent = getResult.response.contentAsString
+            val userPoint = objectMapper.readValue(responseContent, UserPoint::class.java)
+            val finalPoint = userPoint.point
             val expected = chargeAmount * chargesPerUser
             assertThat(finalPoint).isEqualTo(expected)
         }
