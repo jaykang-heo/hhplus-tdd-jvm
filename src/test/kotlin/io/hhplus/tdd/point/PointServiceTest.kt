@@ -4,6 +4,7 @@ import io.hhplus.tdd.dummy.DummyChargePointCommandValidator
 import io.hhplus.tdd.dummy.DummyFindPointHistoryQueryValidator
 import io.hhplus.tdd.dummy.DummyFindUserPointQueryValidator
 import io.hhplus.tdd.dummy.DummyUsePointCommandValidator
+import io.hhplus.tdd.fake.FakeLockManager
 import io.hhplus.tdd.point.command.ChargePointCommand
 import io.hhplus.tdd.point.command.UsePointCommand
 import io.hhplus.tdd.point.model.PointHistory
@@ -30,6 +31,7 @@ class PointServiceTest {
     private val dummyChargePointCommandValidator = DummyChargePointCommandValidator()
     private val dummyUsePointCommandValidator = DummyUsePointCommandValidator()
     private val stubChargePointCommandPreModifier = StubChargePointCommandPreModifier()
+    private val fakeLockManager = FakeLockManager()
     private val sut = PointService(
         mockUserPointRepository,
         mockPointHistoryRepository,
@@ -37,7 +39,8 @@ class PointServiceTest {
         dummyFindPointHistoryQueryValidator,
         dummyChargePointCommandValidator,
         dummyUsePointCommandValidator,
-        stubChargePointCommandPreModifier
+        stubChargePointCommandPreModifier,
+        fakeLockManager
     )
 
     @Test

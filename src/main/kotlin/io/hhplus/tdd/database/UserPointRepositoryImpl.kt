@@ -10,25 +10,20 @@ import org.springframework.stereotype.Repository
 @Repository
 class UserPointRepositoryImpl(
     private val userPointTable: UserPointTable,
-    private val pointHistoryTable: PointHistoryTable,
-    private val lockManager: LockManager
+    private val pointHistoryTable: PointHistoryTable
 ) : UserPointRepository {
 
     override fun charge(command: ChargePointCommand): UserPoint {
-        return lockManager.executeWithLock {
-            val currentPoint = userPointTable.selectById(command.id).point
-            val newPoint = currentPoint + command.amount
-            val updatedUserPoint = userPointTable.insertOrUpdate(command.id, newPoint)
+        val currentPoint = userPointTable.selectById(command.id).point
+        val newPoint = currentPoint + command.amount
+        pointHistoryTable.insert(
+            id = command.id,
+            amount = command.amount,
+            transactionType = TransactionType.CHARGE,
+            updateMillis = System.currentTimeMillis()
+        )
 
-            pointHistoryTable.insert(
-                id = command.id,
-                amount = command.amount,
-                transactionType = TransactionType.CHARGE,
-                updateMillis = System.currentTimeMillis()
-            )
-
-            updatedUserPoint
-        }
+        return userPointTable.insertOrUpdate(command.id, newPoint)
     }
 
     override fun use(command: UsePointCommand): UserPoint {

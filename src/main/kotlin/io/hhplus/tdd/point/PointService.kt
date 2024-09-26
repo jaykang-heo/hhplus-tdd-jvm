@@ -1,5 +1,6 @@
 package io.hhplus.tdd.point
 
+import io.hhplus.tdd.database.LockManager
 import io.hhplus.tdd.point.command.ChargePointCommand
 import io.hhplus.tdd.point.command.UsePointCommand
 import io.hhplus.tdd.point.model.PointHistory
@@ -24,18 +25,23 @@ class PointService(
     private val findPointHistoryQueryValidator: FindPointHistoryQueryValidator,
     private val chargePointCommandValidator: ChargePointCommandValidator,
     private val usePointCommandValidator: UsePointCommandValidator,
-    private val chargePointCommandPreModifier: ChargePointCommandPreModifier
+    private val chargePointCommandPreModifier: ChargePointCommandPreModifier,
+    private val lockManager: LockManager
 ) : IPointService {
 
     override fun charge(command: ChargePointCommand): UserPoint {
-        chargePointCommandValidator.validate(command)
-        val modifiedCommand = chargePointCommandPreModifier.modify(command)
-        return userPointRepository.charge(modifiedCommand)
+        return lockManager.executeWithLock {
+            chargePointCommandValidator.validate(command)
+            val modifiedCommand = chargePointCommandPreModifier.modify(command)
+            userPointRepository.charge(modifiedCommand)
+        }
     }
 
     override fun use(command: UsePointCommand): UserPoint {
-        usePointCommandValidator.validate(command)
-        return userPointRepository.use(command)
+        return lockManager.executeWithLock {
+            usePointCommandValidator.validate(command)
+            userPointRepository.use(command)
+        }
     }
 
     override fun findUserPoint(query: FindUserPointQuery): UserPoint {
