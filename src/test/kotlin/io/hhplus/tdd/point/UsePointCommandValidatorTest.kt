@@ -69,7 +69,7 @@ class UsePointCommandValidatorTest {
 
     @Test
     @DisplayName("사용 명령을 내릴때 잔고가 충분하면, 성공한다")
-    fun `when`() {
+    fun `when use point and balance is sufficient, then succeed`() {
         // given
         val id = Random.nextLong(1, Long.MAX_VALUE)
         val amount = 100L
@@ -79,5 +79,17 @@ class UsePointCommandValidatorTest {
 
         // when, then
         assertDoesNotThrow { sut.validate(command) }
+    }
+
+    @Test
+    @DisplayName("사용 명령의 금액이 1보다 작으면, 에러를 반환한다")
+    fun `when amount in use command is less than 1, then throw error`() {
+        // given
+        val id = 1L
+        val amount = -1L
+        val command = UsePointCommand(id, amount)
+
+        // when, then
+        assertThrows<RuntimeException> { sut.validate(command) }
     }
 }

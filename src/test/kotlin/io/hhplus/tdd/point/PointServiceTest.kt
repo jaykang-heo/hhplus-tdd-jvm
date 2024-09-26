@@ -61,7 +61,7 @@ class PointServiceTest {
     @DisplayName("포인트 사용 명령을 내리면, 사용 명령을 내린 포인트 금액과 함께 유저 포인트를 반환한다")
     fun `when use command, then return user point with intended amount`() {
         // given
-        val id = Random.nextLong()
+        val id = Random.nextLong(1, Long.MAX_VALUE)
         val amount = Random.nextLong()
         val command = UsePointCommand(id, amount)
         val expected = UserPoint(id, amount, System.currentTimeMillis())

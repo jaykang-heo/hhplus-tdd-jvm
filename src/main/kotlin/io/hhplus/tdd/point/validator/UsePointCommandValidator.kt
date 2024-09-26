@@ -14,6 +14,10 @@ class UsePointCommandValidator(
             throw RuntimeException("id ${command.id} cannot be less than 1")
         }
 
+        if (command.amount < 1) {
+            throw RuntimeException("amount ${command.amount} cannot be less than 1")
+        }
+
         val savedPoint = userPointRepository.getById(command.id).point
         if (savedPoint < command.amount) {
             throw RuntimeException("${command.amount} is greater than saved point amount $savedPoint")
